@@ -57,6 +57,9 @@ int main() {
             rate = 19.95;
             bill = rate;
             break;
+        default:
+            cout << "Not a package" << endl;
+            return 0;
     }
 
     cout << "Final bill is: " << bill << endl;
