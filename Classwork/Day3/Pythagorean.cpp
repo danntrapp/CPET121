@@ -3,31 +3,28 @@
 #include <iomanip>
 
 using namespace std;
-void truncate(float &val, int places) {
-    int temp;
-    float deci = pow(10, places);
-    temp = val * deci;
-    val = temp / deci;
-}
 
 int main() {
-    int places = 3;
     //declaring vars
-    float l, w, c;
+    double l, w, c;
     //taking in user vals
+    cout << "Length: ";
     cin >> l;
+    cout << "Width: ";
     cin >> w;
     //area
-    c = l * w;
-    truncate(c, places);
+    c = (l * w);
+
+    cout << setprecision(3);
+    cout << setw(10);
     cout << "Area: " << c << endl;
     //perimeter
-    c = (l * 2) + (w * 2);
-    truncate(c, places);
+    c = (l * 2.0) + (w * 2.0);
+
     cout << "Perimeter: " << c << endl;
     //pythag
-    c = sqrt(pow(l, 2) + pow(w, 2));
-    truncate(c, places);
+    c = sqrt(pow(l, 2.0) + pow(w, 2.0));
+
     cout << "Diagonal: " << c << endl;
     return 0;
 }
