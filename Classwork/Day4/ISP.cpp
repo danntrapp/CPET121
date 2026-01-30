@@ -12,17 +12,22 @@ Z) and the number of hours they have used. Using this information, the
 program should calculate the total bill.*/
 using namespace std;
 int main() {
+
     char package;
+
     double rate;
     double extraRate;
     double bill;
+
     int hours;
     int userHours;
 
     cout << "Package: ";
     cin >> package;
+    
     cout << "Num hours: ";
     cin >> userHours;
+
     auto calculateBill = [] (int userHours, double rate, double extraRate, int hours) -> double {
         double bill;
         if(userHours >= hours) {
@@ -34,6 +39,7 @@ int main() {
         }
         return bill;
     };
+
     switch(package) {
         case('X'):
             rate = 9.95;
