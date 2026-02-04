@@ -15,12 +15,9 @@ int main() {
 
     char package;
 
-    double rate;
-    double extraRate;
-    double bill;
+    double rate, extraRate, bill;
 
-    int hours;
-    int userHours;
+    int hours, userHours;
 
     cout << "Package: ";
     cin >> package;
@@ -35,7 +32,7 @@ int main() {
             userHours -= hours;
             bill += userHours * extraRate;
         } else {
-            bill += rate * hours;
+            bill = rate;
         }
         return bill;
     };
