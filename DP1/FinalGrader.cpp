@@ -1,8 +1,5 @@
-//#include "Assignment.hpp"
 #include <iostream>
 #include <iomanip>
-
-
 
 const int hwNum = 4;
 const int hwMaxPoints = 5;
@@ -16,7 +13,7 @@ const int midtermNum = 1;
 const int midtermMaxPoints = 100;
 const double midtermWeight = 0.25;
 
-const int finalNum = 1;
+const int finalNum = 1; 
 const int finalPoints = 200;
 const double finalWeight = 0.30;
 
@@ -85,23 +82,23 @@ int main() {
         cout << fixed << setprecision(2);
 
     cout << left << setw(21) << setfill('.') << "Homework Average"
-         << ": " << right << setw(8) << setfill(' ') << hwGrade << endl;
+         << " :" << right << setw(8) << setfill(' ') << hwGrade << endl;
     cout << left << setw(21) << setfill('.') << "Laboratory Average"
-         << ": " << right << setw(8) << setfill(' ') << labGrade << endl;
+         << " :" << right << setw(8) << setfill(' ') << labGrade << endl;
 
     cout << left << setw(21) << setfill('.') << "Midterm Exam"
-         << ": " << right << setw(8) << setfill(' ') << midtermGrade << endl;
+         << " :" << right << setw(8) << setfill(' ') << midtermGrade << endl;
 
     cout << left << setw(21) << setfill('.') << "Final Exam"
-         << ": " << right << setw(8) << setfill(' ') << finalGrade << endl;
+         << " :" << right << setw(8) << setfill(' ') << finalGrade << endl;
          
-
+    cout << setprecision(0) << fixed;
     cout << left << setw(21) << setfill('.') << "Term Paper"
-         << ": " << right << setw(8) << setfill(' ') << paperGrade << "[" << paper << "]" << endl;
+         << " :" << right << setw(8) << setfill(' ') << paperGrade << " [" << paper << "]" << endl;
 
     cout << left << setw(21) << setfill('.') << "Class Participation"
-         << ": " << right << setw(8) << setfill(' ') << participationGrade << endl;
-
+         << " :" << right << setw(8) << setfill(' ') << participationGrade << endl;
+    cout << setprecision(2) << fixed;
     hwGrade *= hwWeight;
     labGrade *= labWeight;
     midtermGrade *= midtermWeight;
@@ -124,11 +121,15 @@ int main() {
     }
 
     cout << left << setw(21) << setfill('.') << "Class Average"
-         << ": " << right << setw(8) << setfill(' ') << totGrade << endl << endl;;
+         << " :" << right << setw(8) << setfill(' ') << totGrade << endl << endl;;
 
     cout << left << setw(21) << setfill('.') << "Course Letter Grade"
-         << ": " << right << setw(8) << setfill(' ') << letterGrade << endl;
-    
+         << " :" << right << setw(8) << setfill(' ') << letterGrade << endl;
+
+    if(totGrade <= 70.0) {
+        cout << "Please see your academic adviser." << endl;
+    }
 
     return 0;
+
 }
