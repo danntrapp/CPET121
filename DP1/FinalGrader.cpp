@@ -1,29 +1,29 @@
 #include <iostream>
 #include <iomanip>
 //defining consts, just makes it easier rather than checking pdf again and again
-const int hwNum = 4;
-const int hwMaxPoints = 5;
-const double hwWeight = 0.10;
+const int HW_NUM = 4;
+const int HW_MAX_POINTS = 5;
+const double HW_WEIGHT = 0.10;
 
-const int labNum = 3;
-const int labMaxPoints = 20;
-const double labWeight = 0.20;
+const int LAB_NUM = 3;
+const int LAB_MAX_POINTS = 20;
+const double LAB_WEIGHT = 0.20;
 
-const int midtermNum = 1;
-const int midtermMaxPoints = 100;
-const double midtermWeight = 0.25;
+const int MIDTERM_NUM = 1;
+const int MIDTERM_MAX_POINTS = 100;
+const double MIDTERM_WEIGHT = 0.25;
 
-const int finalNum = 1; 
-const int finalPoints = 200;
-const double finalWeight = 0.30;
+const int FINAL_NUM = 1; 
+const int FINAL_POINTS = 200;
+const double FINAL_WEIGHT = 0.30;
 
-const double termPaperWeight = 0.10;
+const double TERM_PAPER_WEIGHT = 0.10;
 
-const double participationWeight = 0.05;
+const double PARTICIPATION_WEIGHT = 0.05;
 //vars to store each grade
 double hwGrade, labGrade, midtermGrade, paperGrade, finalGrade, participationGrade;
 //int arrays to store things with more than one assignment, standard ints for midterm and final
-int hw[hwNum], lab[labNum], midterm, finalExam;
+int hw[HW_NUM], lab[LAB_NUM], midterm, finalExam;
 bool participation;     //participation is a boolean
 char paper;             //char to store paper
 
@@ -56,10 +56,10 @@ int main() {
         return grade;
     };
     //grading all the assignments out of 100%
-    hwGrade = grade(hw, hwNum, hwMaxPoints);
-    labGrade = grade(lab, labNum, labMaxPoints);
-    midtermGrade = (static_cast<double>(midterm) / midtermMaxPoints) * 100;
-    finalGrade = (static_cast<double>(finalExam) / finalPoints) * 100;
+    hwGrade = grade(hw, HW_NUM, HW_MAX_POINTS);
+    labGrade = grade(lab, LAB_NUM, LAB_MAX_POINTS);
+    midtermGrade = (static_cast<double>(midterm) / MIDTERM_MAX_POINTS) * 100;
+    finalGrade = (static_cast<double>(finalExam) / FINAL_POINTS) * 100;
     participationGrade = static_cast<int>(participation) * 100;
     //switch case for the paper to determine numerical grade
     switch(paper) {
@@ -106,12 +106,12 @@ int main() {
          << " :" << right << setw(8) << setfill(' ') << participationGrade << endl;
     cout << setprecision(2) << fixed;
     //multiply each grade by their weight and then sum all to determine final grade
-    hwGrade *= hwWeight;
-    labGrade *= labWeight;
-    midtermGrade *= midtermWeight;
-    finalGrade *= finalWeight;
-    paperGrade *= termPaperWeight;
-    participationGrade *= participationWeight;
+    hwGrade *= HW_WEIGHT;
+    labGrade *= LAB_WEIGHT;
+    midtermGrade *= MIDTERM_WEIGHT;
+    finalGrade *= FINAL_WEIGHT;
+    paperGrade *= TERM_PAPER_WEIGHT;
+    participationGrade *= PARTICIPATION_WEIGHT;
 
     totGrade = hwGrade + labGrade + midtermGrade + finalGrade + paperGrade + participationGrade;
     //determining final letter grade using if else
