@@ -1,43 +1,42 @@
-#include <iostream>
-#include <fstream>
-#include <vector>
-#include <string>
-#include <iomanip>
-#include <map>
-#include <bitset>
+#include <cctype>
 #include <cstdint>
-#include <filesystem>
+#include <fstream>
+#include <iostream>
+#include <map>
+#include <string>
+#include <vector>
 
-void parseString(std::string fullLine, std::vector<std::string> &vec) {
+void parseString(const std::string &fullLine, std::vector<std::string> &vec) {
     std::string s;
-    for(int i = 0; i < fullLine.size(); i++) {
-        if(!std::isalpha(static_cast<int>(fullLine.at(i)))) {
-            fullLine.erase(fullLine.begin() + i);
-        } else {
-            s.push_back(fullLine.at(i));
-            if(s.size() == 5) {
-                vec.push_back(s);
-                s.clear();
-            }
+    for (char c : fullLine) {
+        if (!std::isalpha(static_cast<unsigned char>(c))) {
+            continue;
+        }
+        s.push_back(c);
+        if (s.size() == 5) {
+            vec.push_back(s);
+            s.clear();
         }
     }
 }
-uint8_t stringToBin(std::string s) {
-    uint8_t bin = 0b11111;
-    try {
-        if(s.size() != 5) throw std::invalid_argument("Wrong size dummy");
 
-        auto flipBit = [](uint8_t &bin, int pos) -> void { 
-            bin ^= (1 << pos);
-        };
-
-        for(int i = 0; i < 5; i++) {
-            if(std::islower(static_cast<int>(s.at(i)))) flipBit(bin, i);
-        }
-    } catch(std::invalid_argument &err) {
-        printf(err.what()); 
+uint8_t stringToBin(const std::string &s) {
+    if (s.size() != 5) {
+        return 0;
     }
-    std::cout << bin << std::endl; //debug
+
+    uint8_t bin = 0b11111;
+    auto flipBit = [](uint8_t &bin, int pos) {
+        bin ^= (1 << pos);
+    };
+
+    // Most significant bit comes from first char
+    for (int i = 0; i < 5; i++) {
+        if (std::islower(static_cast<unsigned char>(s[i]))) {
+            flipBit(bin, 4 - i);
+        }
+    }
+
     return bin;
 }
 std::string decipherBin(const std::vector<uint8_t> input) {
@@ -88,7 +87,6 @@ std::string decipherBin(const std::vector<uint8_t> input) {
             printf("Runtime Error: %s\n", err.what());
         }
     }
-    std::cout << ret << std::endl; //debug
     return ret;
 }
 
@@ -97,7 +95,7 @@ int main() {
     std::ifstream file;
     std::vector<uint8_t> bins;
     std::vector<std::string> parsedStrings;
-    fileName = "humpty.txt";
+    fileName = "drew.txt";  // input used for the given test case
 
     try {
         file.open(fileName.c_str());
@@ -113,7 +111,6 @@ int main() {
     std::cout << full << std::endl;
     parseString(full, parsedStrings);
     for(std::string s : parsedStrings) {
-        std::cout << s << std::endl;
         bins.push_back(stringToBin(s));
     }
     full.clear();
