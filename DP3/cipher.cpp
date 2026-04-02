@@ -8,24 +8,22 @@
 #include <cstdint>
 #include <filesystem>
 
-std::vector<std::string> parseString(std::string fullLine) {
-    std::vector<std::string> ret;
+void parseString(std::string fullLine, std::vector<std::string> &vec) {
     std::string s;
     for(int i = 0; i < fullLine.size(); i++) {
         if(!std::isalpha(static_cast<int>(fullLine.at(i)))) {
-            fullLine.erase(i);
+            fullLine.erase(fullLine.begin() + i);
         } else {
-            s.append(&fullLine.at(i));
+            s.push_back(fullLine.at(i));
             if(s.size() == 5) {
-                ret.push_back(s);
+                vec.push_back(s);
                 s.clear();
             }
         }
     }
-    return ret;
 }
 uint8_t stringToBin(std::string s) {
-    uint8_t bin = 0b00000;
+    uint8_t bin = 0b11111;
     try {
         if(s.size() != 5) throw std::invalid_argument("Wrong size dummy");
 
@@ -99,31 +97,28 @@ int main() {
     std::ifstream file;
     std::vector<uint8_t> bins;
     std::vector<std::string> parsedStrings;
-    // fileName = "humpty.txt";
+    fileName = "humpty.txt";
 
-    // try {
-    //     file.open(fileName.c_str());
-    //     if(!file.is_open()) throw std::runtime_error("File could not be opened");
-    // }   catch(std::runtime_error &err) {
-    //     printf("Runtime Error: %s\n", err.what());
-    //     return 1;
-    // }
+    try {
+        file.open(fileName.c_str());
+        if(!file.is_open()) throw std::runtime_error("File could not be opened");
+    }   catch(std::runtime_error &err) {
+        printf("Runtime Error: %s\n", err.what());
+        return 1;
+    }
 
-    // while(std::getline(file, line)) {
-    //     full.append(line);
-    // }
-    // parsedStrings = parseString(full);
-    // for(std::string s : parsedStrings) {
-    //     bins.push_back(stringToBin(s));
-    // }
-    // full.clear();
-    // full = decipherBin(bins);
+    while(std::getline(file, line)) {
+        full.append(line);
+    }
+    std::cout << full << std::endl;
+    parseString(full, parsedStrings);
+    for(std::string s : parsedStrings) {
+        std::cout << s << std::endl;
+        bins.push_back(stringToBin(s));
+    }
+    full.clear();
+    full = decipherBin(bins);
 
-    // std::cout << full << std::endl;
-
-    line = "HUmPTY";
-    bins.push_back(stringToBin(line));
-    std::cout << decipherBin(bins);
-    printf("%s", line.c_str());
+    std::cout << full << std::endl;
     return 0;
 }
