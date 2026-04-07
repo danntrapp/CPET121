@@ -2,120 +2,102 @@
 #include <cstdint>
 #include <fstream>
 #include <iostream>
-#include <map>
 #include <string>
 #include <vector>
 
+
+//intakes full line to parse and the vector to place the parsed strings into
 void parseString(const std::string &fullLine, std::vector<std::string> &vec) {
-    std::string s;
-    for (char c : fullLine) {
-        if (!std::isalpha(static_cast<unsigned char>(c))) {
+    std::string input;
+    //for each char in the string fullLine check if alpha
+    for (char c : fullLine) {   
+        if (!std::isalpha(static_cast<unsigned char>(c)))
             continue;
-        }
-        s.push_back(c);
-        if (s.size() == 5) {
-            vec.push_back(s);
-            s.clear();
+        //if the char is alpha append it to input string
+        input.push_back(c);      
+        //if the string is of size 5 append the string to the vec and clear input
+        if (input.size() == 5) {   
+            vec.push_back(input);   
+            input.clear();
         }
     }
 }
 
 uint8_t stringToBin(const std::string &s) {
+    //check if size is valid
     if (s.size() != 5) {
         return 0;
     }
+    //inital binary num
+    uint8_t bin = 0;
 
-    uint8_t bin = 0b11111;
+    //helper function to flip bit, passes the num to change and index of bit
     auto flipBit = [](uint8_t &bin, int pos) {
         bin ^= (1 << pos);
     };
-
-    // Most significant bit comes from first char
+    //for each char in the string if it is lower flip the bit at its corresponding location
     for (int i = 0; i < 5; i++) {
         if (std::islower(static_cast<unsigned char>(s[i]))) {
             flipBit(bin, 4 - i);
         }
     }
-
     return bin;
 }
-std::string decipherBin(const std::vector<uint8_t> input) {
-    const std::map<uint8_t, char> cipherMap = {
-    {0b11111, 'A'},
-    {0b11110, 'B'},
-    {0b11101, 'C'},
-    {0b11100, 'D'},
-    {0b11011, 'E'},
-    {0b11010, 'F'},
-    {0b11001, 'G'},
-    {0b11000, 'H'},
-    {0b10111, 'I'},
-    {0b10110, 'J'},
-    {0b10101, 'K'},
-    {0b10100, 'L'},
-    {0b10011, 'M'},
-    {0b10010, 'N'},
-    {0b10001, 'O'},
-    {0b10000, 'P'},
-    {0b01111, 'Q'},
-    {0b01110, 'R'},
-    {0b01101, 'S'},
-    {0b01100, 'T'},
-    {0b01011, 'U'},
-    {0b01010, 'V'},
-    {0b01001, 'W'},
-    {0b01000, 'X'},
-    {0b00111, 'Y'},
-    {0b00110, 'Z'},
-    {0b00101, '.'},
-    {0b00100, ';'},
-    {0b00011, '!'},
-    {0b00010, '?'},
-    {0b00001, '0'},
-    {0b00000, ' '}};
-
+std::string decipherBin(const std::vector<uint8_t> &input, const std::vector<char> &charMap) {
+    //defining return var
     std::string ret;
+    //defining the cipherMap
+    //for each bin input to cipher map as key then return val
     for(uint8_t i : input) {
         try {
-            auto c = cipherMap.find(i);
-            if(c != cipherMap.end()) {
-                ret.push_back(c->second);
-            } else {
-                throw std::runtime_error("Invalid cipher input");
-            }
-        } catch(std::runtime_error& err) {
+            auto c = charMap.at(i);
+            ret.push_back(c);
+        } catch(std::out_of_range& err) {
             printf("Runtime Error: %s\n", err.what());
         }
     }
     return ret;
 }
 
-int main() {
-    std::string fileName, line, full;
-    std::ifstream file;
-    std::vector<uint8_t> bins;
-    std::vector<std::string> parsedStrings;
-    fileName = "drew.txt";  // input used for the given test case
-
+std::string readInFile(const std::string& fileName, std::ifstream &file) {
+    std::string full, line;
     try {
         file.open(fileName.c_str());
         if(!file.is_open()) throw std::runtime_error("File could not be opened");
-    }   catch(std::runtime_error &err) {
+    } catch(std::runtime_error &err) {
         printf("Runtime Error: %s\n", err.what());
-        return 1;
+        return nullptr;
     }
 
     while(std::getline(file, line)) {
         full.append(line);
     }
+    return full;
+}
+
+int main() {
+    std::string fileName, full, message;
+    std::ifstream file;
+    std::vector<uint8_t> bins;
+    std::vector<std::string> parsedStrings;
+    
+    const std::vector<char> charMap = {
+    'A', 'B', 'C', 'D', 'E', 'F', 'G',
+    'H', 'I', 'J', 'K', 'L', 'M', 'N',
+    'O', 'P', 'Q', 'R', 'S', 'T', 'U', 
+    'V', 'W', 'X', 'Y', 'Z', '.', ';', 
+    '!', '?', '0', ' '};
+    std::cout << "Enter File Name: ";
+    std::getline(std::cin, fileName);
+    fileName.append(".txt");
+    full = readInFile(fileName, file);
     std::cout << full << std::endl;
     parseString(full, parsedStrings);
     for(std::string s : parsedStrings) {
         bins.push_back(stringToBin(s));
     }
-    full.clear();
-    full = decipherBin(bins);
+    message = decipherBin(bins, charMap);
 
-    std::cout << full << std::endl;
+    std::cout << message << std::endl;
     return 0;
 }
