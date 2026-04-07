@@ -5,57 +5,59 @@
 #include <cstdint>
 #include <cctype>
 
+// Strips all non-alpha characters from fullLine into ret
 void parseString(const std::string &fullLine, std::string &ret) {
-    for (char c : fullLine) {   
+    for (char c : fullLine) {
         if (!std::isalpha(static_cast<unsigned char>(c)))
             continue;
-        //if the char is alpha append it to input string
         ret.push_back(c);
     }
 }
+
+// Encodes message into text using Baconian cipher; lowercase = 1 (B), uppercase = 0 (A)
 void createCipher(std::string &text, std::string &mess, const std::vector<char> charMap) {
     std::vector<uint8_t> bins;
-    for(char c : mess) {
+
+    // Convert each message character to its Baconian index via charMap
+    for (char c : mess) {
         char upperC = std::toupper(static_cast<unsigned char>(c));
         uint8_t pos = 0;
         bool found = false;
-        for(uint8_t i = 0; i < charMap.size(); i++) {
-            if(charMap[i] == upperC) {
+        for (uint8_t i = 0; i < charMap.size(); i++) {
+            if (charMap[i] == upperC) {
                 pos = i;
                 found = true;
                 break;
             }
         }
-        if(found) {
-            bins.push_back(pos);
-        }
+        if (found) bins.push_back(pos);
     }
-    
+
+    // Verify the cover text has enough alpha characters (5 per encoded char)
     std::string parsed;
     parseString(text, parsed);
     int chars = parsed.size() / 5;
-    if(chars < mess.size()) {
+    if (chars < mess.size()) {
         printf("Need %i more chars to encode this message\r\n", (mess.size() - chars) * 5);
         return;
     }
 
+    // Record the position of every alpha character in the original text
     std::vector<int> alphaPos;
-    for(int i = 0; i < text.size(); i++) {
-        if(std::isalpha(static_cast<unsigned char>(text[i]))) {
+    for (int i = 0; i < text.size(); i++) {
+        if (std::isalpha(static_cast<unsigned char>(text[i])))
             alphaPos.push_back(i);
-        }
     }
 
+    // Write each 5-bit Baconian value into the cover text; bit 4 (MSB) -> first char of group
     int index = 0;
-    for(uint8_t binVal : bins) {
-
-        for(int bit = 0; bit < 5; bit++) {
+    for (uint8_t binVal : bins) {
+        for (int bit = 0; bit < 5; bit++) {
             int textPos = alphaPos[index * 5 + bit];
-            if(binVal & (1 << (4 - bit))) {
+            if (binVal & (1 << (4 - bit)))
                 text[textPos] = std::tolower(static_cast<unsigned char>(text[textPos]));
-            } else {
+            else
                 text[textPos] = std::toupper(static_cast<unsigned char>(text[textPos]));
-            }
         }
         index++;
     }
@@ -64,6 +66,8 @@ void createCipher(std::string &text, std::string &mess, const std::vector<char> 
 int main(void) {
     std::ofstream ofFile;
     std::string message, full;
+
+    // Index = Baconian value (0-25 = A-Z), extended with punctuation and space
     const std::vector<char> charMap = {
     'A', 'B', 'C', 'D', 'E', 'F', 'G',
     'H', 'I', 'J', 'K', 'L', 'M', 'N',
@@ -75,7 +79,9 @@ int main(void) {
     std::getline(std::cin, message);
     std::cout << "Text to encode message into: ";
     std::getline(std::cin, full);
-    createCipher(full, message, charMap);
+
+    createCipher(full, message, charMap);  // Encode message into cover text
+
     ofFile.open("lauda.txt");
     ofFile << full;
     ofFile.close();
