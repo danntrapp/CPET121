@@ -7,7 +7,7 @@
 
 class Calc {
     public: 
-    enum sumType {RIGHT, LEFT, MID};
+    enum sumType {RIGHT, LEFT, MID, TRAP};
     static double estimateArea(std::function<double(double)> func, 
                                std::pair<double, double> interval, 
                                int numSubdivisions, sumType s);

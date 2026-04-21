@@ -29,8 +29,8 @@ uint8_t stringToBin(const std::string &s) {
     uint8_t bin = 0;
 
     // Flips bit at position pos in bin
-    auto flipBit = [](uint8_t &bin, int pos) {
-        bin ^= (1 << pos);
+    auto flipBit = [](uint8_t &b, int pos) {
+        b ^= (1 << pos);
     };
 
     // Index 0 -> bit 4 (MSB), index 4 -> bit 0 (LSB)
@@ -63,7 +63,7 @@ std::string readInFile(const std::string& fileName, std::ifstream &file) {
         if (!file.is_open()) throw std::runtime_error("File could not be opened");
     } catch (std::runtime_error &err) {
         printf("Runtime Error: %s\n", err.what());
-        return nullptr;
+        return "";
     }
 
     while (std::getline(file, line)) {
@@ -92,7 +92,7 @@ int main() {
     std::cout << full << std::endl;
 
     parseString(full, parsedStrings);                        // Step 1: tokenize
-    for (std::string s : parsedStrings) bins.push_back(stringToBin(s)); // Step 2: encode
+    for (const std::string& s : parsedStrings) bins.push_back(stringToBin(s)); // Step 2: encode
     message = decipherBin(bins, charMap);                    // Step 3: decode
 
     std::cout << message << std::endl;
