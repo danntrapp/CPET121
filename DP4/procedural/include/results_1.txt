@@ -1,0 +1,11 @@
+The chosen word is stomp.
+
+The character i was not found! The error count is 1.
+The character o was found!
+The character p was found!
+The character t was found!
+The character a was not found! The error count is 2.
+The character s was found!
+The character m was found!
+
+The user successfully found the word.

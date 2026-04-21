@@ -9,4 +9,5 @@ add_executable(Activity1
         include/parts.h
         testing.cpp
         whole.cpp
-        fraction.cpp)
+        fraction.cpp
+        ../../Testing/testing1.cpp)

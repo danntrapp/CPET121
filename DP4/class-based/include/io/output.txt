@@ -1,0 +1,16 @@
+The word chosen is: baneful
+The letter a has been found!
+The letter e has been found!
+The letter i was not found. The error count is 0.
+The letter o was not found. The error count is 1.
+The letter p was not found. The error count is 2.
+The letter m was not found. The error count is 3.
+The letter n has been found!
+The letter r was not found. The error count is 4.
+The letter s was not found. The error count is 5.
+The letter c was not found. The error count is 6.
+The letter f has been found!
+The letter h was not found. The error count is 7.
+The letter j was not found. The error count is 8.
+You Lose!
+
