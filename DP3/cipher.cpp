@@ -9,8 +9,7 @@
 void parseString(const std::string &fullLine, std::vector<std::string> &vec) {
     std::string input;
     for (char c : fullLine) {
-        if (!std::isalpha(static_cast<unsigned char>(c)))
-            continue;
+        if (!std::isalpha(static_cast<unsigned char>(c))) continue;
 
         input.push_back(c);
 
@@ -29,9 +28,7 @@ uint8_t stringToBin(const std::string &s) {
     uint8_t bin = 0;
 
     // Flips bit at position pos in bin
-    auto flipBit = [](uint8_t &b, int pos) {
-        b ^= (1 << pos);
-    };
+    auto flipBit = [](uint8_t &b, int pos) { b ^= (1 << pos); };
 
     // Index 0 -> bit 4 (MSB), index 4 -> bit 0 (LSB)
     for (int i = 0; i < 5; i++) {
@@ -79,22 +76,35 @@ int main() {
     std::vector<std::string> parsedStrings;
     // Index = Baconian value (0-25 = A-Z), extended with punctuation and space
     const std::vector<char> charMap = {
-    'A', 'B', 'C', 'D', 'E', 'F', 'G',
-    'H', 'I', 'J', 'K', 'L', 'M', 'N',
-    'O', 'P', 'Q', 'R', 'S', 'T', 'U', 
-    'V', 'W', 'X', 'Y', 'Z', '.', ';', 
-    '!', '?', '0', ' '};
+        'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
+        'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+        '.', ';', '!', '?', '0', ' '};
+
     std::cout << "Enter File Name: ";
     std::getline(std::cin, fileName);
     fileName.append(".txt");
 
     full = readInFile(fileName, file);
-    std::cout << full << std::endl;
+    if (full.empty()) return 1;
 
-    parseString(full, parsedStrings);                        // Step 1: tokenize
-    for (const std::string& s : parsedStrings) bins.push_back(stringToBin(s)); // Step 2: encode
-    message = decipherBin(bins, charMap);                    // Step 3: decode
+    parseString(full, parsedStrings);                    // Step 1: tokenize
+    for (const std::string& s : parsedStrings)
+        bins.push_back(stringToBin(s));                  // Step 2: encode
+    message = decipherBin(bins, charMap);                // Step 3: decode
 
-    std::cout << message << std::endl;
+    // Build output filename: strip ".txt", append "_result.txt"
+    std::string outName = fileName.substr(0, fileName.size() - 4) + "_result.txt";
+
+    std::ofstream outFile(outName);
+    if (!outFile.is_open()) {
+        std::cerr << "Error: Could not create output file: " << outName << std::endl;
+        return 1;
+    }
+
+    outFile << full << std::endl;
+    outFile << message << std::endl;
+    outFile.close();
+
+    std::cout << "Result written to " << outName << std::endl;
     return 0;
 }
