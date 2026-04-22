@@ -21,14 +21,16 @@ void parseString(const std::string &fullLine, std::vector<std::string> &vec) {
     }
 }
 
+// Flips bit at position pos in bin
+void flipBit(int &b, int pos) {
+    b ^= (1 << pos);
+}
+
 // Converts a 5-char string to a 5-bit value; lowercase = 1 (B), uppercase = 0 (A)
-uint8_t stringToBin(const std::string &s) {
+int stringToBin(const std::string &s) {
     if (s.size() != 5) return 0;
 
-    uint8_t bin = 0;
-
-    // Flips bit at position pos in bin
-    auto flipBit = [](uint8_t &b, int pos) { b ^= (1 << pos); };
+    int bin = 0;
 
     // Index 0 -> bit 4 (MSB), index 4 -> bit 0 (LSB)
     for (int i = 0; i < 5; i++) {
@@ -40,13 +42,13 @@ uint8_t stringToBin(const std::string &s) {
 }
 
 // Decodes binary values to plaintext using charMap as a lookup table
-std::string decipherBin(const std::vector<uint8_t> &input, const std::vector<char> &charMap) {
+std::string decipherBin(const std::vector<int> &input, const std::vector<char> &charMap) {
     std::string ret;
-    for (uint8_t i : input) {
+    for (int i : input) {
         try {
             ret.push_back(charMap.at(i));
         } catch (std::out_of_range& err) {
-            printf("Runtime Error: %s\n", err.what());
+            std::cout << "Runtime Error: " << err.what() << "\n";
         }
     }
     return ret;
@@ -59,7 +61,7 @@ std::string readInFile(const std::string& fileName, std::ifstream &file) {
         file.open(fileName.c_str());
         if (!file.is_open()) throw std::runtime_error("File could not be opened");
     } catch (std::runtime_error &err) {
-        printf("Runtime Error: %s\n", err.what());
+        std::cout << "Runtime Error: " << err.what() << "\n";
         return "";
     }
 
@@ -72,7 +74,7 @@ std::string readInFile(const std::string& fileName, std::ifstream &file) {
 int main() {
     std::string fileName, full, message;
     std::ifstream file;
-    std::vector<uint8_t> bins;
+    std::vector<int> bins;
     std::vector<std::string> parsedStrings;
     // Index = Baconian value (0-25 = A-Z), extended with punctuation and space
     const std::vector<char> charMap = {
@@ -88,8 +90,10 @@ int main() {
     if (full.empty()) return 1;
 
     parseString(full, parsedStrings);                    // Step 1: tokenize
-    for (const std::string& s : parsedStrings)
-        bins.push_back(stringToBin(s));                  // Step 2: encode
+    for (const std::string& s : parsedStrings) {
+        bins.push_back(stringToBin(s));
+    }
+    // Step 2: encode
     message = decipherBin(bins, charMap);                // Step 3: decode
 
     // Build output filename: strip ".txt", append "_result.txt"
