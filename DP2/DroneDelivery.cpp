@@ -10,25 +10,28 @@
 
 #include <cmath>
 #include <iostream>
+#include <iomanip>
 
-constexpr int BOARD_SIZE   = 11;
-constexpr int DRONE_COUNT  = 8;
-constexpr int MAX_DIST     = 999999999;
-constexpr int WAREHOUSE_X  = 5;
-constexpr int WAREHOUSE_Y  = 5;
+const int BOARD_SIZE = 11;
+const int DRONE_COUNT = 8;
+const int MAX_DIST = 999999999;
+const int WAREHOUSE_X = 5;
+const int WAREHOUSE_Y = 5;
 
+int droneXs[DRONE_COUNT] = {2, 2, 2, 5, 5, 8, 8, 8};
+int droneYs[DRONE_COUNT] = {2, 5, 8, 2, 8, 2, 5, 8};
 // ============================================================
-// Name: getDistanceSq()
+// Name: getDist()
 // Input: Two (x, y) positions
 // Output: int - squared Euclidean distance between them
 // Purpose: Returns the squared distance to avoid floating-point
 //          math while still allowing relative comparisons.
 // ============================================================
-int getDistanceSq(int ax, int ay, int bx, int by)
+double getDist(int ax, int ay, int bx, int by)
 {
-    int deltaX = std::abs(ax - bx);
-    int deltaY = std::abs(ay - by);
-    return (deltaX * deltaX) + (deltaY * deltaY);
+    double deltaX = std::abs(bx - ax);
+    double deltaY = std::abs(by - ay);
+    return std::sqrt((deltaX * deltaX) + (deltaY * deltaY));
 }
 
 // ============================================================
@@ -43,7 +46,7 @@ void printBoard(char board[][BOARD_SIZE])
     {
         for (int j = 0; j < BOARD_SIZE; j++)
         {
-            std::cout << board[i][j] << "  ";
+            std::cout << " " << board[i][j];
         }
         std::cout << "\n";
     }
@@ -56,18 +59,30 @@ void printBoard(char board[][BOARD_SIZE])
 //         warehouse position
 // Purpose: Validates user input before any board operations.
 // ============================================================
-bool isValid(int x, int y)
+char isValid(int x, int y)
 {
     bool outOfBounds = (x >= BOARD_SIZE || x < 0 ||
                         y >= BOARD_SIZE || y < 0);
     bool isWarehouse = (x == WAREHOUSE_X && y == WAREHOUSE_Y);
+    bool onDrone = false;
 
-    if (outOfBounds || isWarehouse)
-    {
-        std::cout << "Invalid coordinate\n";
-        return false;
+    for(int i = 0; i < DRONE_COUNT; i++){
+        if(x == droneXs[i] && y == droneYs[i]) {
+            onDrone = true;
+        }
     }
-    return true;
+
+    if (outOfBounds)
+    {
+        return 'o';
+    } else if(isWarehouse) {
+        return 'w';
+    } else if(onDrone) {
+        return 'd';
+    } else {
+        return 'v';
+    }
+    
 }
 
 // ============================================================
@@ -81,17 +96,18 @@ bool isValid(int x, int y)
 int indexOfClosest(int targetX, int targetY,
                    int droneXs[], int droneYs[])
 {
-    int minDist  = MAX_DIST;
+    int minDist = MAX_DIST;
     int minIndex = 0;
 
     for (int i = 0; i < DRONE_COUNT; i++)
     {
-        int distSq = getDistanceSq(droneXs[i], droneYs[i], targetX, targetY) +
-                     getDistanceSq(droneXs[i], droneYs[i], WAREHOUSE_X, WAREHOUSE_Y);
+        double dist = getDist(droneXs[i], droneYs[i], WAREHOUSE_X, WAREHOUSE_Y);
+        dist += getDist(WAREHOUSE_X, WAREHOUSE_Y, targetX, targetY);
+        dist += getDist(targetX, targetY, droneXs[i], droneYs[i]);
 
-        if (distSq < minDist)
+        if (dist < minDist)
         {
-            minDist  = distSq;
+            minDist = dist;
             minIndex = i;
         }
     }
@@ -112,8 +128,8 @@ void moveDrone(int newX, int newY, int droneIndex,
                char board[][BOARD_SIZE],
                int droneXs[], int droneYs[])
 {
-    int oldX      = droneXs[droneIndex];
-    int oldY      = droneYs[droneIndex];
+    int oldX = droneXs[droneIndex];
+    int oldY = droneYs[droneIndex];
     char droneChar = board[oldX][oldY];
 
     board[oldX][oldY] = '*';
@@ -134,44 +150,49 @@ int main()
 {
     char board[BOARD_SIZE][BOARD_SIZE];
 
-    int droneXs[DRONE_COUNT] = {2, 2, 2, 5, 5, 8, 8, 8};
-    int droneYs[DRONE_COUNT] = {2, 5, 8, 2, 8, 2, 5, 8};
-
     for (int i = 0; i < BOARD_SIZE; i++)
+    {
         for (int j = 0; j < BOARD_SIZE; j++)
+        {
             board[i][j] = '*';
+        }
+    }
 
     board[WAREHOUSE_X][WAREHOUSE_Y] = 'W';
 
     for (int i = 0; i < DRONE_COUNT; i++)
-        board[droneXs[i]][droneYs[i]] = '0' + static_cast<char>(i);
-
-    std::cout << "Starting Board\n\n";
+    {
+        board[droneXs[i]][droneYs[i]] = '1' + static_cast<char>(i);
+    }
+    int inputX, inputY;
+    std::cin >> inputX;
+    std::cin >> inputY;
+    board[inputX][inputY] = 'P';
     printBoard(board);
     std::cout << "\n";
+    char v = isValid(inputX, inputY);
 
-    char continueFlag = 'Y';
-    while (continueFlag == 'Y')
-    {
-        int inputX, inputY;
-        std::cout << "X value: ";
-        std::cin >> inputX;
-        std::cout << "Y value: ";
-        std::cin >> inputY;
-
-        if (isValid(inputX, inputY))
-        {
-            int closestIdx = indexOfClosest(inputX, inputY, droneXs, droneYs);
-            std::cout << "Drone #" << closestIdx << " is closest\n";
-            moveDrone(inputX, inputY, closestIdx, board, droneXs, droneYs);
-            std::cout << "New Board\n\n";
-            printBoard(board);
+        switch(v) {
+            case('w'):
+            case('o'):
+                std::cout << "Sorry, illegal delivery location\n";
+                break;
+            case('d'):
+                int closestIdx = indexOfClosest(inputX, inputY, droneXs, droneYs);
+                double dist = getDist(droneXs[closestIdx], droneYs[closestIdx], WAREHOUSE_X, WAREHOUSE_Y);
+                dist += getDist(WAREHOUSE_X, WAREHOUSE_Y, inputX, inputY);
+                dist += getDist(inputX, inputY, droneXs[closestIdx], droneYs[closestIdx]);
+                std::cout << "Drone " << closestIdx + 1 << " will make the delivery\n";
+                moveDrone(inputX, inputY, closestIdx, board, droneXs, droneYs);
+                std::cout << std::fixed << std::setprecision(2);
+                std::cout << "Thank you for using our Drone delivery service\n";
+            case('v'):
+                std::cout << "This drone traveled a distance of  " << dist << " blocks\n";
+                break;
         }
-
-        std::cout << "Type 'Y' to continue: ";
-        std::cin >> continueFlag;
-        std::cout << "\n";
-    }
+        if(v != 'w' && v!= 'o') {
+            std::cout << "Thank you for using our Drone delivery service\n";
+        }
 
     return 0;
 }
