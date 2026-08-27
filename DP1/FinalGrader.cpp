@@ -1,45 +1,47 @@
 #include <iostream>
 #include <iomanip>
-//defining consts, just makes it easier rather than checking pdf again and again
-const int HW_NUM = 4;
-const int HW_MAX_POINTS = 5;
-const double HW_WEIGHT = 0.10;
+//defining consts, just makes it easier rather than checking PDF again and again
+namespace GradingConsts {
+    constexpr int HW_NUM = 4;
+    constexpr int HW_MAX_POINTS = 5;
+    constexpr double HW_WEIGHT = 0.10;
 
-const int LAB_NUM = 3;
-const int LAB_MAX_POINTS = 20;
-const double LAB_WEIGHT = 0.20;
+    constexpr int LAB_NUM = 3;
+    constexpr int LAB_MAX_POINTS = 20;
+    constexpr double LAB_WEIGHT = 0.20;
 
-const int MIDTERM_NUM = 1;
-const int MIDTERM_MAX_POINTS = 100;
-const double MIDTERM_WEIGHT = 0.25;
+    constexpr int MIDTERM_NUM = 1;
+    constexpr int MIDTERM_MAX_POINTS = 100;
+    constexpr double MIDTERM_WEIGHT = 0.25;
 
-const int FINAL_NUM = 1; 
-const int FINAL_POINTS = 200;
-const double FINAL_WEIGHT = 0.30;
+    constexpr int FINAL_NUM = 1;
+    constexpr int FINAL_POINTS = 200;
+    constexpr double FINAL_WEIGHT = 0.30;
 
-const double TERM_PAPER_WEIGHT = 0.10;
+    constexpr double TERM_PAPER_WEIGHT = 0.10;
 
-const double PARTICIPATION_WEIGHT = 0.05;
+    constexpr double PARTICIPATION_WEIGHT = 0.05;
+}
 //vars to store each grade
 double hwGrade, labGrade, midtermGrade, paperGrade, finalGrade, participationGrade;
 //int arrays to store things with more than one assignment, standard ints for midterm and final
-int hw[HW_NUM], lab[LAB_NUM], midterm, finalExam;
+int hw[GradingConsts::HW_NUM], lab[GradingConsts::LAB_NUM], midterm, finalExam;
 bool participation;     //participation is a boolean
 char paper;             //char to store paper
 
-double totGrade;        //the total grade (aka final grade but I already have a var named that)
+double totGrade;        //the total grade (aka final grade, but I already have a var named that)
 char letterGrade;       //char for final letter grade
 
 
-using namespace std;
+using namespace GradingConsts;
 int main() {
     //taking in all the grades for each assignment
-    cin >> hw[0] >> hw[1] >> hw[2] >> hw[3];
-    cin >> lab[0] >> lab[1] >> lab[2];
-    cin >> midterm;
-    cin >> finalExam;
-    cin >> paper;
-    cin >> participation;
+    std::cin >> hw[0] >> hw[1] >> hw[2] >> hw[3];
+    std::cin >> lab[0] >> lab[1] >> lab[2];
+    std::cin >> midterm;
+    std::cin >> finalExam;
+    std::cin >> paper;
+    std::cin >> participation;
     /*  little lambda function to use for hw and lab to make it easier
         intakes an arr of ints, the size of the arr and the max pts each assignment can get */
     auto grade = [](int arr[], int size, int maxPts) {
@@ -83,28 +85,29 @@ int main() {
         case 'f':
             paperGrade = 55;
             break;
+        default:
+            paperGrade = 0;
     }
     //setting output to fixed point and 2 decimal places of accuracy
-    cout << fixed << setprecision(2);
+    std::cout << std::fixed << std::setprecision(2);
+    //small lambda to re-use for formatting each output.
+    auto formatNPrint = [](const std::string &name, const double val) {
+        std::cout << std::left << std::setw(21) << std::setfill('.') << name
+         << " :" << std::right << std::setw(8) << std::setfill(' ') << val << std::endl;
+    };
     //outputting the average grade for each category
-    cout << left << setw(21) << setfill('.') << "Homework Average"
-         << " :" << right << setw(8) << setfill(' ') << hwGrade << endl;
-    cout << left << setw(21) << setfill('.') << "Laboratory Average"
-         << " :" << right << setw(8) << setfill(' ') << labGrade << endl;
+    formatNPrint("Homework Average", hwGrade);
+    formatNPrint("Laboratory Average", labGrade);
+    formatNPrint("Midterm Exam", midtermGrade);
+    formatNPrint("Final Exam", finalGrade);
+    //setting precision to 0 places
+    std::cout << std::setprecision(0) << std::fixed;
+    std::cout << std::left << std::setw(21) << std::setfill('.') << "Term Paper"
+         << " :" << std::right << std::setw(8) << std::setfill(' ') << paperGrade << " [" << paper << "]" << std::endl;
 
-    cout << left << setw(21) << setfill('.') << "Midterm Exam"
-         << " :" << right << setw(8) << setfill(' ') << midtermGrade << endl;
+    formatNPrint("Class Participation", participationGrade);
 
-    cout << left << setw(21) << setfill('.') << "Final Exam"
-         << " :" << right << setw(8) << setfill(' ') << finalGrade << endl;
-         
-    cout << setprecision(0) << fixed;
-    cout << left << setw(21) << setfill('.') << "Term Paper"
-         << " :" << right << setw(8) << setfill(' ') << paperGrade << " [" << paper << "]" << endl;
-
-    cout << left << setw(21) << setfill('.') << "Class Participation"
-         << " :" << right << setw(8) << setfill(' ') << participationGrade << endl;
-    cout << setprecision(2) << fixed;
+    std::cout << std::setprecision(2) << std::fixed;
     //multiply each grade by their weight and then sum all to determine final grade
     hwGrade *= HW_WEIGHT;
     labGrade *= LAB_WEIGHT;
@@ -127,14 +130,13 @@ int main() {
         letterGrade = 'F';
     }
     //outputting the final grade in numerical and letter form
-    cout << left << setw(21) << setfill('.') << "Class Average"
-         << " :" << right << setw(8) << setfill(' ') << totGrade << endl << endl;;
+    formatNPrint("Class Average", totGrade);
 
-    cout << left << setw(21) << setfill('.') << "Course Letter Grade"
-         << " :" << right << setw(8) << setfill(' ') << letterGrade << endl;
+    std::cout << std::left << std::setw(21) << std::setfill('.') << "Course Letter Grade"
+         << " :" << std::right << std::setw(8) << std::setfill(' ') << letterGrade << std::endl;
     //if you got a D or lower output special message
     if(totGrade <= 70.0) {
-        cout << "Please see your academic adviser." << endl;
+        std::cout << "Please see your academic adviser." << std::endl;
     }
 
     return 0;
